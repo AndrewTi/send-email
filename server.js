@@ -11,6 +11,9 @@ const app = express();
 app
     .use(cors())
     .use(bodyPar.json())
+    .get('/.well-known/acme-challenge/1SyDwT7uEWEVALi6q64AH1NC4DvcntiXsWSbOG2QHr8', (req, res, next) => {
+        res.end('1SyDwT7uEWEVALi6q64AH1NC4DvcntiXsWSbOG2QHr8.4baKHStynxUCgJlxm4TlJz0Ist8ifARJTUP0TIfjUeI');
+    })
     .use('/api', api)
     .use((err, req, res, next) => {
         if(err.name == "CustomError") {
