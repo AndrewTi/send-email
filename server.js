@@ -2,7 +2,21 @@ require('dotenv').config({ path: 'configs/config.env' });
 
 const express = require('express');
 const bodyPar = require('body-parser');
+const https   = require('https');
+const http    = require('http');
 const cors    = require('cors');
+const fs      = require('fs');
+
+const key = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
+const cert = fs.readFileSync(process.env.SSL_CERT, 'utf8');
+const ca = fs.readFileSync(process.env.SSL_CA, 'utf8');
+
+
+const options = {
+    key,
+    cert,
+    ca
+}
 
 const api = require('./api');
 
@@ -11,9 +25,6 @@ const app = express();
 app
     .use(cors())
     .use(bodyPar.json())
-    .get('/.well-known/acme-challenge/1SyDwT7uEWEVALi6q64AH1NC4DvcntiXsWSbOG2QHr8', (req, res, next) => {
-        res.end('1SyDwT7uEWEVALi6q64AH1NC4DvcntiXsWSbOG2QHr8.4baKHStynxUCgJlxm4TlJz0Ist8ifARJTUP0TIfjUeI');
-    })
     .use('/api', api)
     .use((err, req, res, next) => {
         if(err.name == "CustomError") {
@@ -30,4 +41,5 @@ app
         }
     })
 
-app.listen(process.env.PORT);
+http.createServer(app).listen(process.env.PORT);
+https.createServer(options, app).listen(process.env.SSL_PORT);
